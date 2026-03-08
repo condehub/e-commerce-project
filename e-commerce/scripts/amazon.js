@@ -47,7 +47,7 @@ products.forEach((product) => {
         Added
       </div>
 
-      <button class="add-to-cart-button button-primary" data-product-id="${product.id}" data-product-image=${product.image}">
+      <button class="add-to-cart-button button-primary" data-product-id="${product.id}" data-product-image="${product.image}">
         Add to Cart
       </button>
     </div>`;
@@ -57,7 +57,10 @@ products.forEach((product) => {
 
 document.querySelector('.products-grid-js').innerHTML = productsHTML;
 
+
+
 const js_addtocart = document.querySelectorAll('.add-to-cart-button');
+// função para adicionar a funcionalidade de adicionar ao carrinho
 js_addtocart.forEach((button) => {
   button.addEventListener('click', () => {
     const productId = button.dataset.productId;
@@ -66,9 +69,34 @@ js_addtocart.forEach((button) => {
     myCart.push( {
       product: productId,
       quantity: quantity
-    })
-    console.log(myCart);
+    });
+
+    cartQuantityUpdate();
+    calculateCart();
   });
 })
+let cartQuantity = 0;
 
+function cartQuantityUpdate() {
+  cartQuantity = 0;
+  myCart.forEach((item) => {
+      cartQuantity += item.quantity;
+    }
+    
+  )
+    cartQuantityNumber = document.querySelector('.cart-quantity');
+    cartQuantityNumber.innerHTML = cartQuantity;
+
+
+} 
+function calculateCart() {
+  let totalPrice = 0;
+  for (let i = 0; i < myCart.length; i++) {
+    let price = 0;
+    price += ((myCart[i].quantity) * products.find(product => product.id === myCart[i].product).priceCents);
+    totalPrice += price;
+    price = 0;
+  }
+  return totalPrice;
+}
 
