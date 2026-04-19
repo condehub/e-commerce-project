@@ -84,7 +84,7 @@ function cartQuantityUpdate() {
     }
     
   )
-    cartQuantityNumber = document.querySelector('.cart-quantity');
+    let cartQuantityNumber = document.querySelector('.cart-quantity');
     cartQuantityNumber.innerHTML = cartQuantity;
 
 
