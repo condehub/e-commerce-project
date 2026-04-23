@@ -1,15 +1,18 @@
 import { products } from "./products.js";
-export const myCart = [
-  {
-    productId: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
-    quantity: 2,
-  }, {
-    productId: "15b6fc6f-327a-4ec4-896f-486349e85a3d",
-    quantity: 1,
-  }
-];
+export let myCart = JSON.parse(localStorage.getItem('cart'));
+
+
+if (!myCart) {
+  let myCart = [];
+}
 
 let cartQuantity = 0;
+
+function saveToStorage() {
+  // Transforma o array em texto (string) e salva no navegador
+  localStorage.setItem('cart', JSON.stringify(myCart)); 
+}
+
 
 export function addToCart() {
 const js_addtocart = document.querySelectorAll('.add-to-cart-button');
@@ -19,13 +22,22 @@ js_addtocart.forEach((button) => {
       const productId = button.dataset.productId;
       const productContainer = button.parentElement;
       const quantity = parseInt(productContainer.querySelector('select').value);
-      myCart.push( {
-        product: productId,
+
+      let matchingItem = myCart.find((cartItem) => cartItem.productId === productId);
+
+      if (matchingItem) {
+        matchingItem.quantity += quantity;
+      } else {
+        myCart.push( {
+        productId: productId,
         quantity: quantity
-      });
+       });
+      }
+      
 
       cartQuantityUpdate();
       calculateCart(productId);
+      saveToStorage();
     });
   })
 }
@@ -50,10 +62,22 @@ function calculateCart() {
   let totalPrice = 0;
   for (let i = 0; i < myCart.length; i++) {
     let price = 0;
-    price += ((myCart[i].quantity) * products.find(product => product.id === myCart[i].product).priceCents);
+    price += ((myCart[i].quantity) * products.find(product => product.id === myCart[i].productId).priceCents);
     totalPrice += price;
   }
   return totalPrice;
 }
 
 
+ export function removeFromCart(productId) {
+  
+  const newCart = [];
+
+  myCart.forEach((item) => {
+    if (item.productId !== productId) {
+      newCart.push(item)
+    }
+  })
+  
+  myCart = newCart;
+ }
