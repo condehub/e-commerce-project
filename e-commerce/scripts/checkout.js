@@ -1,104 +1,65 @@
-import { myCart, removeFromCart } from "../data/cart.js";
+import { myCart, removeFromCart, saveToStorage } from "../data/cart.js";
 import { products } from "../data/products.js";
 import { convertToFixed } from "./utils/money.js";
 
-const orderSummary = document.querySelector('.order-summary');
-
+// Função auxiliar continua igual
 function findItem(productId) {
-  const foundItem = products.find((product) => product.id === productId );
-  return foundItem;
+  return products.find((product) => product.id === productId);
 }
 
-myCart.forEach(cartItem => { 
+// 1. CRIAMOS A FUNÇÃO DE RENDERIZAÇÃO
+export function renderOrderSummary() {
+  const orderSummary = document.querySelector('.order-summary');
   
-  const matchingProduct = findItem(cartItem.productId);
-  
-  orderSummary.innerHTML += `
-  <div class="cart-item-container">
-      <div class="delivery-date">
-        Delivery date: Tuesday, June 21
-      </div>
+  // 2. A Folha em Branco: Usamos uma variável vazia para montar o HTML
+  let cartSummaryHTML = ''; 
 
+  myCart.forEach(cartItem => { 
+    const matchingProduct = findItem(cartItem.productId);
+    
+    // 3. Montamos o HTML todo na variável (em vez de jogar direto na tela)
+    cartSummaryHTML += `
+    <div class="cart-item-container product-${matchingProduct.id}">
+      <div class="delivery-date">Delivery date: Tuesday, June 21</div>
       <div class="cart-item-details-grid">
-        <img class="product-image"
-          src=${matchingProduct.image}>
-
+        <img class="product-image" src=${matchingProduct.image}>
         <div class="cart-item-details">
-          <div class="product-name">
-            ${matchingProduct.name}
-          </div>
-          <div class="product-price">
-            $${convertToFixed(matchingProduct.priceCents)}
-          </div>
+          <div class="product-name">${matchingProduct.name}</div>
+          <div class="product-price">$${convertToFixed(matchingProduct.priceCents)}</div>
           <div class="product-quantity">
-            <span>
-              Quantity: <span class="quantity-label">${cartItem.quantity}</span>
-            </span>
-            <span class="update-quantity-link link-primary">
-              Update
-            </span>
+            <span>Quantity: <span class="quantity-label">${cartItem.quantity}</span></span>
+            <span class="update-quantity-link link-primary">Update</span>
             <span class="delete-quantity-link link-primary js-delete-link" data-product-id="${matchingProduct.id}">
               Delete
             </span>
           </div>
         </div>
-
-        <div class="delivery-options">
-          <div class="delivery-options-title">
-            Choose a delivery option:
-          </div>
-          <div class="delivery-option">
-            <input type="radio" checked
-              class="delivery-option-input"
-              name="delivery-option-${matchingProduct.id}">
-            <div>
-              <div class="delivery-option-date">
-                Tuesday, June 21
-              </div>
-              <div class="delivery-option-price">
-                FREE Shipping
-              </div>
-            </div>
-          </div>
-          <div class="delivery-option">
-            <input type="radio"
-              class="delivery-option-input"
-              name="delivery-option-${matchingProduct.id}">
-            <div>
-              <div class="delivery-option-date">
-                Wednesday, June 15
-              </div>
-              <div class="delivery-option-price">
-                $4.99 - Shipping
-              </div>
-            </div>
-          </div>
-          <div class="delivery-option">
-            <input type="radio"
-              class="delivery-option-input"
-              name="delivery-option-${matchingProduct.id}">
-            <div>
-              <div class="delivery-option-date">
-                Monday, June 13
-              </div>
-              <div class="delivery-option-price">
-                $9.99 - Shipping
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>`
-});
+    </div>`;
+  });
 
+  // 4. A MÁGICA: Substituímos o HTML antigo pelo novo (o "=" apaga tudo que estava antes)
+  orderSummary.innerHTML = cartSummaryHTML;
 
-document.querySelectorAll('.js-delete-link')
-  .forEach((link) => {
-    link.addEventListener('click', () =>
-      {
+  // 5. Recriamos os eventos de clique APENAS para os novos botões
+  document.querySelectorAll('.js-delete-link')
+    .forEach((link) => {
+      link.addEventListener('click', () => {
         const productId = link.dataset.productId;
+        
+        // Remove do array de dados
         removeFromCart(productId);
-        console.log(myCart)
+        
+        // Salva a alteração (descomentei o seu saveToStorage)
+        saveToStorage(); 
+        
+        // 6. O PULO DO GATO: Em vez de usar .remove() na div, nós mandamos 
+        // a página se desenhar inteira de novo! Como o item não está mais 
+        // no myCart, ele simplesmente não vai aparecer na tela.
+        renderOrderSummary(); 
       });
- });
+   });
+}
 
+// 7. Chamamos a função uma vez no final do arquivo para ela rodar quando a página carregar
+renderOrderSummary();

@@ -1,14 +1,11 @@
 import { products } from "./products.js";
-export let myCart = JSON.parse(localStorage.getItem('cart'));
 
+export let myCart = JSON.parse(localStorage.getItem('cart')) || [];
 
-if (!myCart) {
-  let myCart = [];
-}
 
 let cartQuantity = 0;
 
-function saveToStorage() {
+export function saveToStorage() {
   // Transforma o array em texto (string) e salva no navegador
   localStorage.setItem('cart', JSON.stringify(myCart)); 
 }
