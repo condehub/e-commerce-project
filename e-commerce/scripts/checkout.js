@@ -1,6 +1,8 @@
 import { myCart, removeFromCart, saveToStorage } from "../data/cart.js";
 import { products } from "../data/products.js";
 import { convertToFixed } from "./utils/money.js";
+import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
+
 
 function findItem(productId) {
   return products.find((product) => product.id === productId);
@@ -8,8 +10,13 @@ function findItem(productId) {
 
 
 export function renderOrderSummary() {
+  let cartQuantityItems = 0;
+
+  myCart.forEach((cartItem) => {
+    cartQuantityItems += cartItem.quantity;
+  });
+
   const orderSummary = document.querySelector('.order-summary');
-  
  
   let cartSummaryHTML = ''; 
 
@@ -40,7 +47,13 @@ export function renderOrderSummary() {
  
   orderSummary.innerHTML = cartSummaryHTML;
 
-  
+
+
+  const cartQuantityElement = document.querySelector('.return-to-home-link');
+  if (cartQuantityElement) {
+    cartQuantityElement.innerHTML = `${cartQuantityItems} items`;
+  }
+
   document.querySelectorAll('.js-delete-link')
     .forEach((link) => {
       link.addEventListener('click', () => {
@@ -59,3 +72,6 @@ export function renderOrderSummary() {
 
 
 renderOrderSummary();
+
+const hoje = dayjs();
+console.log(hoje.format('D'))

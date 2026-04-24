@@ -40,6 +40,10 @@ js_addtocart.forEach((button) => {
 }
 
 
+  myCart.forEach((cartItem) => {
+    cartQuantity += cartItem.quantity;
+  });
+
 
 
 function cartQuantityUpdate() {
